@@ -77,9 +77,3 @@ Open http://localhost:5173. You'll see two sign-in options:
 | FR-01.6 | `backend/routes/assessments.js` PATCH endpoint (annotate/override/approve); `ProposalReport.jsx` admin panel; assessments default to `ai_draft` and are never marked "shared" until `admin_approved` |
 | FR-01.7 | All files stored under `backend/uploads`, DB is local SQLite on your infrastructure; `geminiService.js` has an explicit comment + `GEMINI_API_BASE` override point for routing through a private/VPC LLM endpoint instead of the public API |
 | FR-01.8 | `audit_log` table records every login, submission, AI assessment, edit, and approval, with proposal version + grant call reference + timestamp; `AuditLog.jsx` admin view. Proposal `version` column auto-increments per researcher/grant-call. Wire a scheduled archival job for the 7-year retention policy in production |
-
-## Important production notes
-1. **SSO**: Google SSO is real (token verified server-side via `google-auth-library`), not mocked. For an enterprise IdP instead of Google (Azure AD, Okta, ADFS via SAML/OIDC), swap `routes/auth.js`'s `/sso/google` handler for an equivalent token/assertion verification step — the rest of the app already expects a signed app-level JWT, so only that one handler needs to change.
-2. **Confidentiality (FR-01.7)**: if public Gemini API usage isn't acceptable for sensitive proposals, point `GEMINI_API_BASE` in `.env` at an approved private/VPC Gemini (Vertex AI) endpoint, or swap `geminiService.js` for an on-prem LLM client — no other code changes required.
-3. **Retention**: add a scheduled job/export to satisfy the 7-year audit retention requirement (FR-01.8); SQLite is fine for a pilot, but plan a migration to Postgres/SQL Server for production scale and backups.
-4. **File size limits**: confirm with IT and adjust `limits.fileSize` in `backend/routes/proposals.js` (currently 25MB).
