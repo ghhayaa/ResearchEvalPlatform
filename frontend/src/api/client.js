@@ -1,10 +1,12 @@
 import axios from "axios";
 
-const BASE_URL = window.location.hostname === "localhost"
-  ? "/api"
-  : "https://researchevalplatform.onrender.com/api";
+const isProd = typeof window !== "undefined" &&
+  !window.location.hostname.includes("localhost") &&
+  !window.location.hostname.includes("127.0.0.1");
 
-const client = axios.create({ baseURL: BASE_URL });
+const client = axios.create({
+  baseURL: isProd ? "https://researchevalplatform.onrender.com/api" : "/api"
+});
 
 client.interceptors.request.use((config) => {
   const token = localStorage.getItem("pe_token");
