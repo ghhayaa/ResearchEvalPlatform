@@ -1,8 +1,10 @@
 import axios from "axios";
 
-const client = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || "/api"
-});
+const BASE_URL = window.location.hostname === "localhost"
+  ? "/api"
+  : "https://researchevalplatform.onrender.com/api";
+
+const client = axios.create({ baseURL: BASE_URL });
 
 client.interceptors.request.use((config) => {
   const token = localStorage.getItem("pe_token");
